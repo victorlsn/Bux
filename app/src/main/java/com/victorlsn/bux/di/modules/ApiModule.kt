@@ -6,6 +6,7 @@ import com.google.gson.GsonBuilder
 import com.victorlsn.bux.BuildConfig
 import com.victorlsn.bux.data.api.MyWebSocketListener
 import com.victorlsn.bux.data.api.RxCallAdapterFactory
+import com.victorlsn.bux.data.api.WebSocketMessageHandler
 import com.victorlsn.bux.data.api.auth.TokenInterceptor
 import com.victorlsn.bux.data.api.connectivity.ConnectivityInterceptor
 import com.victorlsn.bux.data.api.connectivity.InternetConnectivityChecker
@@ -66,7 +67,7 @@ class ApiModule {
     fun provideWebSocket(
         client: OkHttpClient,
         request: Request,
-        webSocketListener: WebSocketListener
+        webSocketListener: MyWebSocketListener
     ): WebSocket {
         return client.newWebSocket(request, webSocketListener)
     }
@@ -82,9 +83,12 @@ class ApiModule {
 
     @Singleton
     @Provides
-    fun provideWebSocketListener(
-    ): WebSocketListener {
-        return MyWebSocketListener()
+    fun provideWebSocketListener(webSocketMessageHandler: WebSocketMessageHandler
+    ): MyWebSocketListener {
+        val webSocketListener = MyWebSocketListener()
+        webSocketListener.setMessageObserver(webSocketMessageHandler)
+
+        return webSocketListener
     }
 
 
@@ -102,6 +106,13 @@ class ApiModule {
                     .withErrorHandling()
             )
             .addConverterFactory(GsonConverterFactory.create(gson))
+    }
+
+    @Singleton
+    @Provides
+    fun provideWebSocketMessageHandler(
+    ): WebSocketMessageHandler {
+        return WebSocketMessageHandler()
     }
 
     @Singleton

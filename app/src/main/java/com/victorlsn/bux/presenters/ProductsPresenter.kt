@@ -4,15 +4,18 @@ import com.victorlsn.bux.contracts.ProductsContract
 import com.victorlsn.bux.data.Repository
 import com.victorlsn.bux.data.api.error_handling.ErrorException
 import com.victorlsn.bux.data.api.models.Product
+import com.victorlsn.bux.data.api.models.WebSocketMessage
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import okhttp3.*
 import org.json.JSONObject
 import retrofit2.HttpException
 import timber.log.Timber
 import javax.inject.Inject
 
 class ProductsPresenter @Inject constructor(
-        private val repository: Repository
+        private val repository: Repository,
+        private val webSocket: WebSocket
     ) : BasePresenter<ProductsContract.View>(), ProductsContract.Presenter {
 
     override fun requestProductDetails(productId: String) {
@@ -36,6 +39,7 @@ class ProductsPresenter @Inject constructor(
         }
         else {
             view?.onProductDetailsSuccess(product)
+            subscribe(product.securityId!!)
         }
     }
 
@@ -53,4 +57,8 @@ class ProductsPresenter @Inject constructor(
         }
     }
 
+    private fun subscribe(productId: String) {
+        val message = WebSocketMessage(subscriptions = arrayListOf(productId))
+        webSocket.send(message.toJsonString())
+    }
 }
