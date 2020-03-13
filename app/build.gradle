@@ -25,6 +25,9 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
+    // Progress Bar (KProgressHud)
+    implementation 'com.kaopiz:kprogresshud:1.2.0'
+
     // Logging (Timber)
     implementation 'com.jakewharton.timber:timber:4.7.1'
 

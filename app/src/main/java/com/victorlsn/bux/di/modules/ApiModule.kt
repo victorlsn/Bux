@@ -4,8 +4,12 @@ import android.app.Application
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.victorlsn.bux.BuildConfig
+import com.victorlsn.bux.data.api.MyWebSocketListener
+import com.victorlsn.bux.data.api.RxCallAdapterFactory
+import com.victorlsn.bux.data.api.auth.TokenInterceptor
 import com.victorlsn.bux.data.api.connectivity.ConnectivityInterceptor
 import com.victorlsn.bux.data.api.connectivity.InternetConnectivityChecker
+import com.victorlsn.bux.data.api.interceptors.HeaderInterceptor
 import com.victorlsn.bux.data.api.services.ApiService
 import dagger.Module
 import dagger.Provides
@@ -23,12 +27,15 @@ class ApiModule {
 
     val REST_URL = "https://api.beta.getbux.com/"
     val WEBSOCKET_URL = "https://rtf.beta.getbux.com/subscriptions/me"
+
     @Singleton
     @Provides
     fun provideOkHttpClientBuilder(
         app: Application,
         connectivityChecker: InternetConnectivityChecker,
-        httpLoggingInterceptor: HttpLoggingInterceptor
+        httpLoggingInterceptor: HttpLoggingInterceptor,
+        tokenInterceptor: TokenInterceptor,
+        @Named("Language-Interceptor") languageInterceptor: HeaderInterceptor
     ): OkHttpClient.Builder {
 
         httpLoggingInterceptor.level = if (BuildConfig.DEBUG)
@@ -44,6 +51,8 @@ class ApiModule {
                     connectivityChecker
                 )
             )
+            .addInterceptor(tokenInterceptor)
+            .addInterceptor(languageInterceptor)
     }
 
     @Singleton
@@ -75,37 +84,7 @@ class ApiModule {
     @Provides
     fun provideWebSocketListener(
     ): WebSocketListener {
-        return object : WebSocketListener() {
-            override fun onOpen(webSocket: WebSocket, response: Response) {
-                Timber.d(response.message)
-                super.onOpen(webSocket, response)
-            }
-
-            override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
-                Timber.d(reason)
-                super.onClosed(webSocket, code, reason)
-            }
-
-            override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
-                Timber.d(reason)
-                super.onClosing(webSocket, code, reason)
-            }
-
-            override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-                Timber.d(response?.message)
-                super.onFailure(webSocket, t, response)
-            }
-
-            override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
-                Timber.d(bytes.hex())
-                super.onMessage(webSocket, bytes)
-            }
-
-            override fun onMessage(webSocket: WebSocket, text: String) {
-                Timber.d(text)
-                super.onMessage(webSocket, text)
-            }
-        }
+        return MyWebSocketListener()
     }
 
 
@@ -118,6 +97,10 @@ class ApiModule {
         return Retrofit.Builder()
             .client(client)
             .baseUrl(REST_URL)
+            .addCallAdapterFactory(
+                RxCallAdapterFactory()
+                    .withErrorHandling()
+            )
             .addConverterFactory(GsonConverterFactory.create(gson))
     }
 
@@ -131,7 +114,7 @@ class ApiModule {
 
     @Singleton
     @Provides
-    fun provideApiService(@Named("Retrofit") retrofit: Retrofit): ApiService {
+    fun provideApiService(retrofit: Retrofit): ApiService {
         return retrofit.create(ApiService::class.java)
     }
 
@@ -159,5 +142,22 @@ class ApiModule {
         return InternetConnectivityChecker(
             app
         )
+    }
+
+    @Singleton
+    @Provides
+    fun provideTokenInterceptor() : TokenInterceptor {
+        return TokenInterceptor("Bearer eyJhbGciOiJIUzI1NiJ9.eyJyZWZyZXNoYWJsZSI6ZmFsc2UsInN1YiI6ImJiMGNkYTJiLWE" +
+                "xMGUtNGVkMy1hZDVhLTBmODJiNGMxNTJjNCIsImF1ZCI6ImJldGEuZ2V0YnV4LmNvbSIsInN" +
+                "jcCI6WyJhcHA6bG9naW4iLCJydGY6bG9naW4iXSwiZXhwIjoxODIwODQ5Mjc5LCJpYXQiOjE" +
+                "1MDU0ODkyNzksImp0aSI6ImI3MzlmYjgwLTM1NzUtNGIwMS04NzUxLTMzZDFhNGRjOGY5MiI" +
+                "sImNpZCI6Ijg0NzM2MjI5MzkifQ.M5oANIi2nBtSfIfhyUMqJnex-JYg6Sm92KPYaUL9GKg")
+    }
+
+    @Singleton
+    @Provides
+    @Named("Language-Interceptor")
+    fun provideLanguageHeader() : HeaderInterceptor {
+        return HeaderInterceptor("Accept-Language", "nl-NL,en;q=0.8")
     }
 }

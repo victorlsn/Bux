@@ -7,5 +7,5 @@ import retrofit2.http.Path
 
 interface ApiService {
     @GET("/core/23/products/{productId}")
-    fun getProduct(@Path("productId", encoded = true) orderId: String) : Observable<Product>
+    fun getProductDetails(@Path("productId", encoded = true) orderId: String) : Observable<Product>
 }
