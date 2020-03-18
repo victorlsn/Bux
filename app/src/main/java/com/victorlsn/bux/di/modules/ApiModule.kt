@@ -1,25 +1,28 @@
 package com.victorlsn.bux.di.modules
 
 import android.app.Application
+import android.content.Context
+import com.dhh.websocket.Config
+import com.dhh.websocket.RxWebSocket
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.victorlsn.bux.BuildConfig
-import com.victorlsn.bux.data.api.MyWebSocketListener
+import com.victorlsn.bux.data.api.websocket.MyWebSocketListener
 import com.victorlsn.bux.data.api.RxCallAdapterFactory
-import com.victorlsn.bux.data.api.WebSocketMessageHandler
+import com.victorlsn.bux.data.api.websocket.WebSocketMessageHandler
 import com.victorlsn.bux.data.api.auth.TokenInterceptor
 import com.victorlsn.bux.data.api.connectivity.ConnectivityInterceptor
 import com.victorlsn.bux.data.api.connectivity.InternetConnectivityChecker
 import com.victorlsn.bux.data.api.interceptors.HeaderInterceptor
 import com.victorlsn.bux.data.api.services.ApiService
+import com.victorlsn.bux.data.api.websocket.SocketWrapper
 import dagger.Module
 import dagger.Provides
 import okhttp3.*
 import okhttp3.logging.HttpLoggingInterceptor
-import okio.ByteString
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import timber.log.Timber
+import java.util.concurrent.TimeUnit
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -54,6 +57,7 @@ class ApiModule {
             )
             .addInterceptor(tokenInterceptor)
             .addInterceptor(languageInterceptor)
+            .retryOnConnectionFailure(true)
     }
 
     @Singleton
@@ -83,9 +87,21 @@ class ApiModule {
 
     @Singleton
     @Provides
+    fun provideSocketWrapper(
+        client: OkHttpClient,
+        request: Request,
+        messageHandler: WebSocketMessageHandler
+    ) : SocketWrapper {
+        return SocketWrapper(client, request, messageHandler)
+    }
+
+    @Singleton
+    @Provides
     fun provideWebSocketListener(webSocketMessageHandler: WebSocketMessageHandler
     ): MyWebSocketListener {
-        val webSocketListener = MyWebSocketListener()
+        val webSocketListener =
+            MyWebSocketListener()
+        webSocketMessageHandler.webSocketListener = webSocketListener
         webSocketListener.setMessageObserver(webSocketMessageHandler)
 
         return webSocketListener

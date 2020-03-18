@@ -1,4 +1,4 @@
-package com.victorlsn.bux.data.api
+package com.victorlsn.bux.data.api.websocket
 
 import io.reactivex.Observer
 import okhttp3.Response
@@ -7,9 +7,11 @@ import okhttp3.WebSocketListener
 import okio.ByteString
 import timber.log.Timber
 
-class MyWebSocketListener : WebSocketListener() {
+open class MyWebSocketListener : WebSocketListener() {
 
     private var observer : Observer<String>? = null
+
+    var isConnected = false
 
     override fun onOpen(webSocket: WebSocket, response: Response) {
         Timber.d("WebSocket Open - %s", response.message)
@@ -42,7 +44,7 @@ class MyWebSocketListener : WebSocketListener() {
         super.onMessage(webSocket, text)
     }
 
-    fun setMessageObserver(observer: Observer<String>) {
+    open fun setMessageObserver(observer: Observer<String>) {
         this.observer = observer
     }
 }

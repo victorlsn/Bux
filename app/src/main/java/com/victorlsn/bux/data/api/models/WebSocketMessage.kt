@@ -7,6 +7,7 @@ class WebSocketMessage(subscriptions: ArrayList<String>? = null, unsubscriptions
     var subscribeTo : ArrayList<String>? = null
     var unsubscribeFrom : ArrayList<String>? = null
     var t : String? = null
+    var body : WebSocketMessageBody? = null
 
     init {
         subscriptions?.let {

@@ -5,6 +5,8 @@ import com.victorlsn.bux.data.Repository
 import com.victorlsn.bux.data.api.error_handling.ErrorException
 import com.victorlsn.bux.data.api.models.Product
 import com.victorlsn.bux.data.api.models.WebSocketMessage
+import com.victorlsn.bux.data.api.websocket.MyWebSocketListener
+import com.victorlsn.bux.data.api.websocket.SocketWrapper
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import okhttp3.*
@@ -15,7 +17,9 @@ import javax.inject.Inject
 
 class ProductsPresenter @Inject constructor(
         private val repository: Repository,
-        private val webSocket: WebSocket
+        private val webSocketWrapper: SocketWrapper
+//        private val webSocket: WebSocket,
+//        private val webSocketListener: MyWebSocketListener
     ) : BasePresenter<ProductsContract.View>(), ProductsContract.Presenter {
 
     private val products = mapOf(
@@ -79,8 +83,11 @@ class ProductsPresenter @Inject constructor(
         }
     }
 
-    private fun subscribe(productId: String) {
-        val message = WebSocketMessage(subscriptions = arrayListOf(productId))
-        webSocket.send(message.toJsonString())
+
+    override fun subscribe(productId: String) {
+//        if (webSocketWrapper.isConnected) {
+            val message = WebSocketMessage(subscriptions = arrayListOf(productId))
+            webSocketWrapper.sendMessage(message.toJsonString())
+//        }
     }
 }

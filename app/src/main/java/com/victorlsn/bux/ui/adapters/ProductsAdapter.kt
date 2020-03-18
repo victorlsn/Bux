@@ -8,9 +8,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.victorlsn.bux.R
 import com.victorlsn.bux.data.api.models.MarketStatus
 import com.victorlsn.bux.data.api.models.Product
+import com.victorlsn.bux.listeners.ProductSelectionListener
 import com.victorlsn.bux.util.extensions.inflate
 
-class ProductsAdapter : RecyclerView.Adapter<ProductsAdapter.ItemHolder>() {
+class ProductsAdapter(private val listener: ProductSelectionListener) : RecyclerView.Adapter<ProductsAdapter.ItemHolder>() {
 
     private val products: MutableList<Product> = mutableListOf()
 
@@ -20,7 +21,11 @@ class ProductsAdapter : RecyclerView.Adapter<ProductsAdapter.ItemHolder>() {
     }
 
     override fun onBindViewHolder(holder: ItemHolder, position: Int) {
-        holder.bind(products[position])
+        val product = products[position]
+        holder.bind(product)
+        holder.itemView.setOnClickListener {
+            listener.onProductSelected(product)
+        }
     }
 
 
@@ -34,8 +39,17 @@ class ProductsAdapter : RecyclerView.Adapter<ProductsAdapter.ItemHolder>() {
         notifyDataSetChanged()
     }
 
+    fun updateProduct(securityId: String?, currentPrice: String?) {
+        for (product in products) {
+            if (securityId == product.securityId) {
+                product.currentPrice.amount = currentPrice
+                notifyDataSetChanged()
+            }
+        }
+    }
 
-    class ItemHolder(val v: View) : RecyclerView.ViewHolder(v) {
+
+    class ItemHolder(v: View) : RecyclerView.ViewHolder(v) {
         private var statusIcon: ImageView = itemView.findViewById(R.id.statusImageView)
         private var productName: TextView = itemView.findViewById(R.id.productNameTextView)
         private var productPrice: TextView = itemView.findViewById(R.id.productPriceTextView)

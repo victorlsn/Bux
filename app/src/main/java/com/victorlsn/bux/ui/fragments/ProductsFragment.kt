@@ -8,22 +8,24 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.flexbox.AlignItems
-import com.google.android.flexbox.FlexDirection
-import com.google.android.flexbox.FlexWrap
-import com.google.android.flexbox.FlexboxLayoutManager
 import com.victorlsn.bux.R
 import com.victorlsn.bux.contracts.ProductsContract
-import com.victorlsn.bux.data.api.WebSocketMessageHandler
+import com.victorlsn.bux.data.api.websocket.WebSocketMessageHandler
 import com.victorlsn.bux.data.api.models.Product
 import com.victorlsn.bux.data.api.models.WebSocketMessage
+import com.victorlsn.bux.data.api.websocket.SocketWrapper
 import com.victorlsn.bux.listeners.MessageListener
+import com.victorlsn.bux.listeners.ProductSelectionListener
 import com.victorlsn.bux.presenters.ProductsPresenter
 import com.victorlsn.bux.ui.adapters.ProductsAdapter
 import kotlinx.android.synthetic.main.fragment_products.*
 import javax.inject.Inject
 
 class ProductsFragment : BaseFragment(), ProductsContract.View, MessageListener {
+
+    @Inject
+    lateinit var socketWrapper: SocketWrapper
+
     @Inject
     lateinit var messageHandler: WebSocketMessageHandler
 
@@ -44,6 +46,7 @@ class ProductsFragment : BaseFragment(), ProductsContract.View, MessageListener 
         super.onCreate(savedInstanceState)
 
         presenter.requestAllProductsDetails()
+        messageHandler.setListener(this)
     }
 
     override fun onCreateView(
@@ -52,7 +55,6 @@ class ProductsFragment : BaseFragment(), ProductsContract.View, MessageListener 
         savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_products, container, false)
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -65,11 +67,11 @@ class ProductsFragment : BaseFragment(), ProductsContract.View, MessageListener 
     private fun setupRecyclerView() {
         val productsAdapter =
             ProductsAdapter(
-//                object : PaymentMethodSelectedListener {
-//                    override fun onPaymentMethodSelected(moduleCode: String) {
-//                        this@TicketOverviewFragment.selectedPaymentMethodCode = moduleCode
-//                    }
-//                }
+                object : ProductSelectionListener {
+                    override fun onProductSelected(product: Product) {
+                        presenter.subscribe(product.securityId)
+                    }
+                }
             )
         productsAdapter.setHasStableIds(true)
 
@@ -114,7 +116,8 @@ class ProductsFragment : BaseFragment(), ProductsContract.View, MessageListener 
     }
 
     override fun onMessageReceived(message: WebSocketMessage) {
-
+        val adapter = productsRecyclerView.adapter as ProductsAdapter
+        adapter.updateProduct(message.body?.securityId, message.body?.currentPrice)
     }
 
     companion object {
