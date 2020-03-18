@@ -1,5 +1,7 @@
 package com.victorlsn.bux.data.api.websocket
 
+import com.google.gson.Gson
+import com.victorlsn.bux.data.api.models.WebSocketMessage
 import io.reactivex.Observer
 import okhttp3.Response
 import okhttp3.WebSocket
@@ -29,6 +31,8 @@ open class MyWebSocketListener : WebSocketListener() {
     }
 
     override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
+        observer?.onError(t)
+        isConnected = false
         Timber.d("WebSocket Failure - %s", response?.message)
         super.onFailure(webSocket, t, response)
     }
@@ -39,6 +43,9 @@ open class MyWebSocketListener : WebSocketListener() {
     }
 
     override fun onMessage(webSocket: WebSocket, text: String) {
+        if (text.contains("connect.connected")) {
+            isConnected = true
+        }
         Timber.d("WebSocket Message received - %s", text)
         observer?.onNext(text)
         super.onMessage(webSocket, text)

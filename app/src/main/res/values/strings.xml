@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name">Bux</string>
-    <string name="check_connection">Check your internet connection!</string>
+    <string name="check_connection">Something is wrong, please check your internet connection!</string>
     <string name="press_back_again">Press back again to exit</string>
     <string name="default_error_message">Something is wrong, please try again later or contact us if the error persists.</string>
+    
 
 </resources>

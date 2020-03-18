@@ -20,6 +20,8 @@ class WebSocketMessageHandler : Observer<String> {
 
     }
 
+    val handler = Handler(Looper.getMainLooper())
+
     override fun onNext(t: String) {
         val message = Gson().fromJson(t, WebSocketMessage::class.java)
         when (message.t) {
@@ -27,7 +29,6 @@ class WebSocketMessageHandler : Observer<String> {
                 webSocketListener?.isConnected = true
             }
             "trading.quote" -> {
-                val handler = Handler(Looper.getMainLooper())
                 val runnable = Runnable {
                     listener?.onMessageReceived(message)
                 }
@@ -37,7 +38,10 @@ class WebSocketMessageHandler : Observer<String> {
     }
 
     override fun onError(e: Throwable) {
-
+        val runnable = Runnable {
+            listener?.onError()
+        }
+        handler.post(runnable)
     }
 
     fun setListener(listener: MessageListener) {

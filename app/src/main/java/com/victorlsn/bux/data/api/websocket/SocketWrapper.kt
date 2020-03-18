@@ -1,5 +1,7 @@
 package com.victorlsn.bux.data.api.websocket
 
+import com.google.gson.Gson
+import com.victorlsn.bux.data.api.models.WebSocketMessage
 import io.reactivex.Single
 import okhttp3.OkHttpClient
 import okhttp3.Request

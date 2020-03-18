@@ -22,10 +22,6 @@ import kotlinx.android.synthetic.main.fragment_products.*
 import javax.inject.Inject
 
 class ProductsFragment : BaseFragment(), ProductsContract.View, MessageListener {
-
-    @Inject
-    lateinit var socketWrapper: SocketWrapper
-
     @Inject
     lateinit var messageHandler: WebSocketMessageHandler
 
@@ -118,6 +114,11 @@ class ProductsFragment : BaseFragment(), ProductsContract.View, MessageListener 
     override fun onMessageReceived(message: WebSocketMessage) {
         val adapter = productsRecyclerView.adapter as ProductsAdapter
         adapter.updateProduct(message.body?.securityId, message.body?.currentPrice)
+    }
+
+    override fun onError() {
+        val errorMessage = getString(R.string.check_connection)
+        Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
     }
 
     companion object {

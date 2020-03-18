@@ -1,26 +1,23 @@
 package com.victorlsn.bux.presenters
 
+import android.os.Handler
 import com.victorlsn.bux.contracts.ProductsContract
 import com.victorlsn.bux.data.Repository
 import com.victorlsn.bux.data.api.error_handling.ErrorException
 import com.victorlsn.bux.data.api.models.Product
 import com.victorlsn.bux.data.api.models.WebSocketMessage
-import com.victorlsn.bux.data.api.websocket.MyWebSocketListener
 import com.victorlsn.bux.data.api.websocket.SocketWrapper
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import okhttp3.*
 import org.json.JSONObject
 import retrofit2.HttpException
 import timber.log.Timber
 import javax.inject.Inject
 
 class ProductsPresenter @Inject constructor(
-        private val repository: Repository,
-        private val webSocketWrapper: SocketWrapper
-//        private val webSocket: WebSocket,
-//        private val webSocketListener: MyWebSocketListener
-    ) : BasePresenter<ProductsContract.View>(), ProductsContract.Presenter {
+    private val repository: Repository,
+    private val webSocketWrapper: SocketWrapper
+) : BasePresenter<ProductsContract.View>(), ProductsContract.Presenter {
 
     private val products = mapOf(
         Pair("Apple", "sb26513"),
@@ -62,8 +59,7 @@ class ProductsPresenter @Inject constructor(
         if (product.errorCode != null) {
             Timber.e(product.developerMessage)
             getProductDetailsFailure(Error(product.message))
-        }
-        else {
+        } else {
             view?.onProductDetailsSuccess(product)
 //            subscribe(product.securityId!!)
         }
@@ -85,9 +81,13 @@ class ProductsPresenter @Inject constructor(
 
 
     override fun subscribe(productId: String) {
-//        if (webSocketWrapper.isConnected) {
+        if (webSocketWrapper.socketListener.isConnected) {
             val message = WebSocketMessage(subscriptions = arrayListOf(productId))
             webSocketWrapper.sendMessage(message.toJsonString())
-//        }
+        } else {
+            Handler().postDelayed({
+                subscribe(productId)
+            }, 2000)
+        }
     }
 }

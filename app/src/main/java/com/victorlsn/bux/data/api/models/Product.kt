@@ -5,7 +5,7 @@ import java.text.DecimalFormat
 
 class Product : BaseResponse() {
     @SerializedName("productMarketStatus")
-    lateinit var marketStatus: MarketStatus
+    var marketStatus: MarketStatus? = null
 
     lateinit var symbol: String
     lateinit var securityId: String
