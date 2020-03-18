@@ -6,6 +6,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.victorlsn.bux.R
+import com.victorlsn.bux.data.api.models.MarketStatus
 import com.victorlsn.bux.data.api.models.Product
 import com.victorlsn.bux.util.extensions.inflate
 
@@ -27,14 +28,9 @@ class ProductsAdapter : RecyclerView.Adapter<ProductsAdapter.ItemHolder>() {
         return products.size
     }
 
-    fun setProducts(productsList: List<Product>) {
-        products.clear()
-        products.addAll(productsList)
-        notifyDataSetChanged()
-    }
-
     fun addProduct(product: Product) {
         products.add(product)
+        products.sortBy { it.displayName }
         notifyDataSetChanged()
     }
 
@@ -47,9 +43,15 @@ class ProductsAdapter : RecyclerView.Adapter<ProductsAdapter.ItemHolder>() {
             itemView.findViewById(R.id.productPriceDifferenceTextView)
 
         fun bind(product: Product) {
+            if (product.marketStatus == MarketStatus.OPEN) {
+                statusIcon.visibility = View.GONE
+            }
+            else {
+                statusIcon.visibility = View.VISIBLE
+            }
 
-            productName.text = product.displayName
-            productPrice.text = product.currentPrice?.getFormattedPrice()
+            productName.text = product.displayName.toUpperCase()
+            productPrice.text = product.currentPrice.getFormattedPrice()
             productPriceDiff.text = product.getFormattedPriceDiff()
         }
     }

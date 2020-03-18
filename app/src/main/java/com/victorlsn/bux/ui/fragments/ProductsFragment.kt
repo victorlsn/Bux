@@ -1,10 +1,13 @@
 package com.victorlsn.bux.ui.fragments
 
+import android.graphics.Rect
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.flexbox.AlignItems
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
@@ -70,14 +73,26 @@ class ProductsFragment : BaseFragment(), ProductsContract.View, MessageListener 
             )
         productsAdapter.setHasStableIds(true)
 
-        val layoutManager = FlexboxLayoutManager(context).apply {
-            flexWrap = FlexWrap.WRAP
-            flexDirection = FlexDirection.ROW
-            alignItems = AlignItems.STRETCH
-        }
+        val layoutManager = GridLayoutManager(context, 2)
 
         productsRecyclerView.layoutManager = layoutManager
         productsRecyclerView.adapter = productsAdapter
+
+        val spacing = 48
+        productsRecyclerView.setPadding(spacing, spacing, spacing, spacing)
+        productsRecyclerView.clipToPadding = false
+        productsRecyclerView.clipChildren = false
+        productsRecyclerView.addItemDecoration(object : RecyclerView.ItemDecoration() {
+            override fun getItemOffsets(
+                outRect: Rect,
+                view: View,
+                parent: RecyclerView,
+                state: RecyclerView.State
+            ) {
+                outRect.set(spacing, spacing, spacing, spacing)
+            }
+        })
+
     }
 
     override fun onProductDetailsSuccess(product: Product) {

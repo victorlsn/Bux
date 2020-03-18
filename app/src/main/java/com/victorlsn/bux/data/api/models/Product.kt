@@ -1,15 +1,23 @@
 package com.victorlsn.bux.data.api.models
 
-import java.text.NumberFormat
+import com.google.gson.annotations.SerializedName
+import java.text.DecimalFormat
 
 class Product : BaseResponse() {
-    var symbol: String? = null
-    var securityId: String? = null
-    var displayName: String? = null
-    var currentPrice: Price? = null
-    var closingPrice: Price? = null
+    @SerializedName("productMarketStatus")
+    lateinit var marketStatus: MarketStatus
+
+    lateinit var symbol: String
+    lateinit var securityId: String
+    lateinit var displayName: String
+    lateinit var currentPrice: Price
+    private lateinit var closingPrice: Price
 
     fun getFormattedPriceDiff() : String {
-        return NumberFormat.getPercentInstance().format(currentPrice!!.getAmount() - closingPrice!!.getAmount() / closingPrice!!.getAmount() * 100f)
+        val percentChange = (currentPrice.getAmount() - closingPrice.getAmount()) / closingPrice.getAmount()
+        val formatter = DecimalFormat("##.##%")
+        formatter.positivePrefix = "+ "
+        formatter.negativePrefix = "- "
+        return formatter.format(percentChange)
     }
 }
