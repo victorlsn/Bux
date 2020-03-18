@@ -1,65 +1,28 @@
 package com.victorlsn.bux.ui.activities
 
+import android.content.Context
 import android.os.Bundle
-import android.widget.Toast
-import com.google.gson.Gson
+import android.util.AttributeSet
+import android.view.View
 import com.victorlsn.bux.R
-import com.victorlsn.bux.contracts.ProductsContract
-import com.victorlsn.bux.data.api.MyWebSocketListener
-import com.victorlsn.bux.data.api.WebSocketMessageHandler
-import com.victorlsn.bux.data.api.models.Product
-import com.victorlsn.bux.data.api.models.WebSocketMessage
-import com.victorlsn.bux.data.api.models.WebSocketResponseMessage
-import com.victorlsn.bux.listeners.MessageListener
-import com.victorlsn.bux.presenters.ProductsPresenter
-import io.reactivex.Observer
-import io.reactivex.disposables.Disposable
-import javax.inject.Inject
+import com.victorlsn.bux.ui.fragments.ProductsFragment
 
 class MainActivity :
-    BaseActivity(), ProductsContract.View, MessageListener {
-
-    @Inject
-    lateinit var messageHandler: WebSocketMessageHandler
-
-    @Inject
-    lateinit var presenter: ProductsPresenter
-
-    override fun onResume() {
-        super.onResume()
-        presenter.attachView(this)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        presenter.detachView()
-    }
+    BaseActivity() {
+    private val fragmentManager = supportFragmentManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
 
-        messageHandler.setListener(this)
-        presenter.requestProductDetails("sb26496")
+        setupProductFragment()
     }
 
-    override fun onProductDetailsSuccess(product: Product) {
-
+    private fun setupProductFragment() {
+        val productsFragment = ProductsFragment.newInstance()
+        fragmentManager.beginTransaction()
+            .add(R.id.main_container, productsFragment, "Products").commit()
     }
 
-    override fun onProductDetailsFailure(error: String?) {
-        val errorMessage = error ?: getString(R.string.default_error_message)
-        Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show()
-    }
 
-    override fun showLoading() {
-        loading.show()
-    }
-
-    override fun hideLoading() {
-        loading.dismiss()
-    }
-
-    override fun onMessageReceived(message: WebSocketMessage) {
-
-    }
 }

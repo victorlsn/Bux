@@ -18,6 +18,28 @@ class ProductsPresenter @Inject constructor(
         private val webSocket: WebSocket
     ) : BasePresenter<ProductsContract.View>(), ProductsContract.Presenter {
 
+    private val products = mapOf(
+        Pair("Apple", "sb26513"),
+        Pair("Deutsche Bank", "sb28248"),
+        Pair("EUR/USD", "sb26502"),
+        Pair("Germany30", "sb26493"),
+        Pair("Gold", "sb26500"),
+        Pair("US500", "sb26496")
+    )
+
+    override fun requestAllProductsDetails() {
+        view?.showLoading()
+
+        for (product in products) {
+            disposable.add(
+                repository.getProductDetails(product.value)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(this::getProductDetailsSuccessfully, this::getProductDetailsFailure)
+            )
+        }
+    }
+
     override fun requestProductDetails(productId: String) {
         Timber.d("Requesting details for product %s", productId)
         view?.showLoading()
@@ -39,7 +61,7 @@ class ProductsPresenter @Inject constructor(
         }
         else {
             view?.onProductDetailsSuccess(product)
-            subscribe(product.securityId!!)
+//            subscribe(product.securityId!!)
         }
     }
 

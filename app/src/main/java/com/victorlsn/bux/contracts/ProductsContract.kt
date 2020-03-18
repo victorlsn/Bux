@@ -16,6 +16,7 @@ class ProductsContract {
     }
 
     interface Presenter {
+        fun requestAllProductsDetails()
         fun requestProductDetails(productId: String)
     }
 }
