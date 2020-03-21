@@ -34,9 +34,11 @@ class ProductsAdapter(private val listener: ProductSelectionListener) : Recycler
     }
 
     fun addProduct(product: Product) {
-        products.add(product)
-        products.sortBy { it.displayName }
-        notifyDataSetChanged()
+        if (!products.contains(product)) {
+            products.add(product)
+            products.sortBy { it.displayName }
+            notifyDataSetChanged()
+        }
     }
 
     fun updateProduct(securityId: String?, currentPrice: String?) {

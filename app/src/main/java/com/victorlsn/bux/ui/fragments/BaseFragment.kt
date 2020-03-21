@@ -3,7 +3,6 @@ package com.victorlsn.bux.ui.fragments
 import android.os.Bundle
 import com.kaopiz.kprogresshud.KProgressHUD
 import com.victorlsn.bux.ui.activities.BaseActivity
-import com.victorlsn.bux.ui.activities.MainActivity
 import dagger.android.support.DaggerFragment
 
 abstract class BaseFragment : DaggerFragment() {

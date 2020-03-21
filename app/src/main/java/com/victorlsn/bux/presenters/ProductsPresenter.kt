@@ -32,18 +32,12 @@ class ProductsPresenter @Inject constructor(
         view?.showLoading()
 
         for (product in products) {
-            disposable.add(
-                repository.getProductDetails(product.value)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(this::getProductDetailsSuccessfully, this::getProductDetailsFailure)
-            )
+            requestProductDetails(product.value)
         }
     }
 
     override fun requestProductDetails(productId: String) {
         Timber.d("Requesting details for product %s", productId)
-        view?.showLoading()
 
         disposable.add(
             repository.getProductDetails(productId)
@@ -61,7 +55,6 @@ class ProductsPresenter @Inject constructor(
             getProductDetailsFailure(Error(product.message))
         } else {
             view?.onProductDetailsSuccess(product)
-//            subscribe(product.securityId!!)
         }
     }
 
@@ -73,10 +66,13 @@ class ProductsPresenter @Inject constructor(
             val cause = exception.cause as HttpException
             val jsonObject = JSONObject(cause.response()!!.errorBody()!!.string())
 
-            view?.onProductDetailsFailure(jsonObject.getString("error_description"))
+            view?.onProductDetailsFailure(jsonObject.getString("message"))
         } catch (e: Throwable) {
-            view?.onProductDetailsFailure(error.localizedMessage!!)
+            view?.onProductDetailsFailure(null)
         }
+        Handler().postDelayed({
+            requestAllProductsDetails()
+        }, 5000)
     }
 
 

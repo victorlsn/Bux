@@ -1,9 +1,10 @@
 package com.victorlsn.bux.data.api.models
 
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 import java.text.DecimalFormat
 
-class Product : BaseResponse() {
+class Product : BaseResponse(), Serializable {
     @SerializedName("productMarketStatus")
     var marketStatus: MarketStatus? = null
 
@@ -19,5 +20,13 @@ class Product : BaseResponse() {
         formatter.positivePrefix = "+ "
         formatter.negativePrefix = "- "
         return formatter.format(percentChange)
+    }
+
+    override fun hashCode(): Int {
+        return securityId.hashCode()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return this.hashCode() == other.hashCode()
     }
 }

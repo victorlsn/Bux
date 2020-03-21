@@ -10,10 +10,9 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.victorlsn.bux.R
 import com.victorlsn.bux.contracts.ProductsContract
-import com.victorlsn.bux.data.api.websocket.WebSocketMessageHandler
 import com.victorlsn.bux.data.api.models.Product
 import com.victorlsn.bux.data.api.models.WebSocketMessage
-import com.victorlsn.bux.data.api.websocket.SocketWrapper
+import com.victorlsn.bux.data.api.websocket.WebSocketMessageHandler
 import com.victorlsn.bux.listeners.MessageListener
 import com.victorlsn.bux.listeners.ProductSelectionListener
 import com.victorlsn.bux.presenters.ProductsPresenter
@@ -66,6 +65,9 @@ class ProductsFragment : BaseFragment(), ProductsContract.View, MessageListener 
                 object : ProductSelectionListener {
                     override fun onProductSelected(product: Product) {
                         presenter.subscribe(product.securityId)
+                        val productDetailsFragment = ProductDetailsFragment.newInstance(product)
+                        childFragmentManager.beginTransaction()
+                            .add(R.id.childContainer, productDetailsFragment, "PRODUCT_DETAIL").commit()
                     }
                 }
             )
@@ -104,11 +106,15 @@ class ProductsFragment : BaseFragment(), ProductsContract.View, MessageListener 
     }
 
     override fun showLoading() {
-        loading.show()
+        if (!loading.isShowing) {
+            loading.show()
+        }
     }
 
     override fun hideLoading() {
-        loading.dismiss()
+        if (loading.isShowing) {
+            loading.dismiss()
+        }
     }
 
     override fun onMessageReceived(message: WebSocketMessage) {
@@ -123,8 +129,7 @@ class ProductsFragment : BaseFragment(), ProductsContract.View, MessageListener 
 
     companion object {
         fun newInstance(): ProductsFragment {
-            val fragment = ProductsFragment()
-            return fragment
+            return ProductsFragment()
         }
     }
 }
