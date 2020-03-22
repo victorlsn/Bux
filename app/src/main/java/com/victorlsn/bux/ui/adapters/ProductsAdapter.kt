@@ -67,6 +67,7 @@ class ProductsAdapter(private val listener: ProductSelectionListener) : Recycler
             }
 
             productName.text = product.displayName.toUpperCase()
+            val price = product.currentPrice.getFormattedPrice()
             productPrice.text = product.currentPrice.getFormattedPrice()
             productPriceDiff.text = product.getFormattedPriceDiff()
         }

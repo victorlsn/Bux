@@ -9,17 +9,20 @@ class Price : Serializable {
     var decimals: Int? = null
     var amount: String? = null
 
-    fun getAmount(): Float {
-        return amount!!.toFloat()
+    fun getAmount(): Float? {
+        return amount?.toFloat()
     }
 
-    fun getFormattedPrice(): String {
-        val currency = Currency.getInstance(currency)
-        val numberFormat = NumberFormat.getCurrencyInstance()
+    fun getFormattedPrice(): String? {
+        if (currency != null && decimals != null && amount != null) {
+            val currency = Currency.getInstance(currency)
+            val numberFormat = NumberFormat.getCurrencyInstance()
 
-        numberFormat.maximumFractionDigits = decimals!!
-        numberFormat.currency = currency
+            numberFormat.maximumFractionDigits = decimals!!
+            numberFormat.currency = currency
 
-        return numberFormat.format(amount?.toFloat())
+            return numberFormat.format(amount?.toFloat())
+        }
+        return null
     }
 }
