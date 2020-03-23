@@ -1,9 +1,12 @@
 package com.victorlsn.bux.modelsTest
 
+import com.victorlsn.bux.data.api.models.MarketStatus
 import com.victorlsn.bux.data.api.models.Price
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
+import org.junit.Before
 import org.junit.Test
+import java.util.*
 
 class PriceUnitTest {
 
@@ -11,19 +14,19 @@ class PriceUnitTest {
 
     @Test
     fun testGetFormattedPriceNullity() {
-        assertEquals(price.getFormattedPrice(), null)
+        assertEquals(null, price.getFormattedPrice())
 
         price.amount = "229.75"
 
-        assertEquals(price.getFormattedPrice(), null)
+        assertEquals(null, price.getFormattedPrice())
 
         price.currency = "USD"
 
-        assertEquals(price.getFormattedPrice(), null)
+        assertEquals(null, price.getFormattedPrice())
 
-        price.decimals = 5
+        price.decimals = 2
 
-        assertNotEquals(price.getFormattedPrice(), null)
+        assertNotEquals(null, price.getFormattedPrice())
     }
 
     @Test
@@ -32,10 +35,10 @@ class PriceUnitTest {
         price.currency = "EUR"
         price.decimals = 2
 
-        assertEquals(price.getFormattedPrice(), "EUR 229,75")
+        assertEquals("229,75 €", price.getFormattedPrice())
 
         price.currency = "USD"
 
-        assertEquals(price.getFormattedPrice(), "US$ 229,75")
+        assertEquals("$229.75", price.getFormattedPrice())
     }
 }

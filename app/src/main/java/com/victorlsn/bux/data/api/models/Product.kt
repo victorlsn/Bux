@@ -13,6 +13,8 @@ class Product : BaseResponse(), Serializable {
     lateinit var displayName: String
     lateinit var currentPrice: Price
     lateinit var closingPrice: Price
+    lateinit var dayRange: Range
+    lateinit var yearRange: Range
 
     fun getFormattedPriceDiff() : String? {
         if (currentPrice.getAmount() != null && closingPrice.getAmount() != null) {

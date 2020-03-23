@@ -14,13 +14,7 @@ abstract class BaseFragment : DaggerFragment() {
         loading = (activity as BaseActivity).loading
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-    }
-
-    override fun onResume() {
-        super.onResume()
-    }
+    open fun resumeFragment() {}
 
     open fun onBackPressed(): Boolean {
         if (childFragmentManager.fragments.size > 0) {
@@ -32,6 +26,15 @@ abstract class BaseFragment : DaggerFragment() {
             else {
                 childFragmentManager.beginTransaction().remove(childFragmentManager.fragments.last()).commitNow()
             }
+
+            if (childFragmentManager.fragments.size > 0) {
+                (childFragmentManager.fragments.last() as? BaseFragment)?.resumeFragment()
+            }
+            else {
+                resumeFragment()
+            }
+
+
             return true
         }
 

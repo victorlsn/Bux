@@ -30,6 +30,7 @@ class ProductDetailsFragment : BaseFragment(), ProductSubscriptionContract.View,
     }
 
     override fun onDestroy() {
+        messageHandler.removeListener()
         presenter.detachView()
         super.onDestroy()
     }
@@ -40,8 +41,6 @@ class ProductDetailsFragment : BaseFragment(), ProductSubscriptionContract.View,
         arguments?.getSerializable(PRODUCT)?.let {
             product = it as Product
         }
-
-        messageHandler.setListener(this)
     }
 
     override fun onCreateView(
@@ -56,6 +55,7 @@ class ProductDetailsFragment : BaseFragment(), ProductSubscriptionContract.View,
         super.onViewCreated(view, savedInstanceState)
 
         setupProductDetails()
+        messageHandler.setListener(this)
     }
 
     private fun setupProductDetails() {
@@ -63,12 +63,16 @@ class ProductDetailsFragment : BaseFragment(), ProductSubscriptionContract.View,
             productNameTextView.text = it.displayName
             productCurrentPrice.text = it.currentPrice.getFormattedPrice()
             productPriceDifference.text = it.getFormattedPriceDiff()
-            productClosingPrice
+            productClosingPrice.text = it.closingPrice.getFormattedPrice()
+            productDayRange.text = it.dayRange.getFormattedRange()
+            productYearRange.text = it.yearRange.getFormattedRange()
         }
     }
 
     override fun onMessageReceived(message: WebSocketMessage) {
-        updateProduct(message.body?.currentPrice)
+        if (message.body?.securityId == product?.securityId) {
+            updateProduct(message.body?.currentPrice)
+        }
     }
 
     override fun onError() {

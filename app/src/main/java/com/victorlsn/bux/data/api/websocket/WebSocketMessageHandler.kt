@@ -20,7 +20,7 @@ class WebSocketMessageHandler : Observer<String> {
 
     }
 
-    val handler = Handler(Looper.getMainLooper())
+    private val handler = Handler(Looper.getMainLooper())
 
     override fun onNext(t: String) {
         val message = Gson().fromJson(t, WebSocketMessage::class.java)
@@ -46,5 +46,9 @@ class WebSocketMessageHandler : Observer<String> {
 
     fun setListener(listener: MessageListener) {
         this.listener = listener
+    }
+
+    fun removeListener() {
+        this.listener = null
     }
 }

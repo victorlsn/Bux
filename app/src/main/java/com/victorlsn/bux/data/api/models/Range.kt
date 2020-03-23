@@ -3,23 +3,22 @@ package com.victorlsn.bux.data.api.models
 import com.victorlsn.bux.util.getLocalFromISO
 import java.io.Serializable
 import java.text.NumberFormat
-import java.util.*
 
-class Price : Serializable {
+class Range : Serializable {
     var currency: String? = null
     var decimals: Int? = null
-    var amount: String? = null
+    var low: String? = null
+    var high: String? = null
 
-    fun getAmount(): Float? {
-        return amount?.toFloat()
-    }
-
-    fun getFormattedPrice(): String? {
-        if (currency != null && decimals != null && amount != null) {
+    fun getFormattedRange(): String? {
+        if (currency != null && decimals != null && low != null && high != null) {
             val numberFormat = NumberFormat.getCurrencyInstance(getLocalFromISO(currency!!))
             numberFormat.maximumFractionDigits = decimals!!
 
-            return numberFormat.format(amount?.toFloat())
+            val min = numberFormat.format(low?.toFloat())
+            val max = numberFormat.format(high?.toFloat())
+
+            return "$min - $max"
         }
         return null
     }

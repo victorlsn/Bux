@@ -41,6 +41,9 @@ class ProductsFragment : BaseFragment(), ProductsContract.View, MessageListener 
         super.onCreate(savedInstanceState)
 
         presenter.requestAllProductsDetails()
+    }
+
+    override fun resumeFragment() {
         messageHandler.setListener(this)
     }
 
@@ -56,6 +59,7 @@ class ProductsFragment : BaseFragment(), ProductsContract.View, MessageListener 
         super.onViewCreated(view, savedInstanceState)
 
         setupRecyclerView()
+        messageHandler.setListener(this)
     }
 
 
