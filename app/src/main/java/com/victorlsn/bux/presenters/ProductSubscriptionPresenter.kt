@@ -25,7 +25,9 @@ class ProductSubscriptionPresenter @Inject constructor(
         if (webSocketWrapper.socketListener.isConnected) {
             val message = WebSocketMessage(subscriptions = arrayListOf(productId))
             webSocketWrapper.sendMessage(message.toJsonString())
-            listener?.onProductSubscriptionChanged(productId, true)
+            Handler().postDelayed({
+                listener?.onProductSubscriptionChanged(productId, true)
+            }, 500)
         } else {
             Handler().postDelayed({
                 subscribe(productId)
@@ -37,7 +39,9 @@ class ProductSubscriptionPresenter @Inject constructor(
         if (webSocketWrapper.socketListener.isConnected) {
             val message = WebSocketMessage(unsubscriptions = arrayListOf(productId))
             webSocketWrapper.sendMessage(message.toJsonString())
-            listener?.onProductSubscriptionChanged(productId, false)
+            Handler().postDelayed({
+                listener?.onProductSubscriptionChanged(productId, false)
+            }, 500)
         } else {
             Handler().postDelayed({
                 unsubscribe(productId)

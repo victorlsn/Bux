@@ -30,17 +30,12 @@ class ProductsFragment : BaseFragment(), ProductsContract.View, MessageListener 
     override fun onResume() {
         super.onResume()
         presenter.attachView(this)
+        presenter.requestAllProductsDetails()
     }
 
     override fun onDestroy() {
         presenter.detachView()
         super.onDestroy()
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        presenter.requestAllProductsDetails()
     }
 
     override fun resumeFragment() {
@@ -68,7 +63,6 @@ class ProductsFragment : BaseFragment(), ProductsContract.View, MessageListener 
             ProductsAdapter(
                 object : ProductSelectionListener {
                     override fun onProductSelected(product: Product) {
-//                        presenter.subscribe(product.securityId)
                         val productDetailsFragment = ProductDetailsFragment.newInstance(product)
                         childFragmentManager.beginTransaction()
                             .add(R.id.childContainer, productDetailsFragment, "PRODUCT_DETAIL")

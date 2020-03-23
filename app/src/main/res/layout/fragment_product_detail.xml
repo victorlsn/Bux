@@ -267,7 +267,7 @@
 		android:layout_width="match_parent"
 		android:layout_height="0dp"
 		android:layout_margin="48dp"
-		android:background="@drawable/rounded_corners_bg"
+		android:background="@drawable/ripple_rounded_corners_bg"
 		android:backgroundTint="@android:color/white"
 		android:text="@string/unsubscribe"
 		android:textSize="14sp"

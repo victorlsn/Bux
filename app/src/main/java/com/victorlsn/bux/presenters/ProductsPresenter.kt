@@ -54,6 +54,7 @@ class ProductsPresenter @Inject constructor(
             Timber.e(product.developerMessage)
             getProductDetailsFailure(Error(product.message))
         } else {
+            view?.hideLoading()
             view?.onProductDetailsSuccess(product)
         }
     }
