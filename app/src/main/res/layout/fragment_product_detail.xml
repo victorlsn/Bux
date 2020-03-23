@@ -261,6 +261,20 @@
 		app:layout_constraintHorizontal_bias="0.5"
 		app:layout_constraintStart_toEndOf="@+id/yearRangeLabel"
 		app:layout_constraintTop_toBottomOf="@id/productDayRange" />
+	
+	<Button
+		android:id="@+id/subscriptionButton"
+		android:layout_width="match_parent"
+		android:layout_height="0dp"
+		android:layout_margin="48dp"
+		android:background="@drawable/rounded_corners_bg"
+		android:backgroundTint="@android:color/white"
+		android:text="@string/unsubscribe"
+		android:textSize="14sp"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintHeight_percent="0.076"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toBottomOf="@id/yearRangeLabel" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

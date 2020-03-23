@@ -68,10 +68,11 @@ class ProductsFragment : BaseFragment(), ProductsContract.View, MessageListener 
             ProductsAdapter(
                 object : ProductSelectionListener {
                     override fun onProductSelected(product: Product) {
-                        presenter.subscribe(product.securityId)
+//                        presenter.subscribe(product.securityId)
                         val productDetailsFragment = ProductDetailsFragment.newInstance(product)
                         childFragmentManager.beginTransaction()
-                            .add(R.id.childContainer, productDetailsFragment, "PRODUCT_DETAIL").commit()
+                            .add(R.id.childContainer, productDetailsFragment, "PRODUCT_DETAIL")
+                            .commit()
                     }
                 }
             )

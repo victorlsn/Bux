@@ -11,11 +11,12 @@ import com.victorlsn.bux.data.api.models.Product
 import com.victorlsn.bux.data.api.models.WebSocketMessage
 import com.victorlsn.bux.data.api.websocket.WebSocketMessageHandler
 import com.victorlsn.bux.listeners.MessageListener
+import com.victorlsn.bux.listeners.ProductSubscriptionListener
 import com.victorlsn.bux.presenters.ProductSubscriptionPresenter
 import kotlinx.android.synthetic.main.fragment_product_detail.*
 import javax.inject.Inject
 
-class ProductDetailsFragment : BaseFragment(), ProductSubscriptionContract.View, MessageListener {
+class ProductDetailsFragment : BaseFragment(), ProductSubscriptionContract.View, MessageListener, ProductSubscriptionListener {
     @Inject
     lateinit var messageHandler: WebSocketMessageHandler
 
@@ -24,13 +25,17 @@ class ProductDetailsFragment : BaseFragment(), ProductSubscriptionContract.View,
 
     var product: Product? = null
 
+    var subscribed = false
+
     override fun onResume() {
         super.onResume()
         presenter.attachView(this)
+        presenter.attachListener(this)
     }
 
     override fun onDestroy() {
         messageHandler.removeListener()
+        presenter.detachView()
         presenter.detachView()
         super.onDestroy()
     }
@@ -40,6 +45,7 @@ class ProductDetailsFragment : BaseFragment(), ProductSubscriptionContract.View,
 
         arguments?.getSerializable(PRODUCT)?.let {
             product = it as Product
+            presenter.subscribe(it.securityId)
         }
     }
 
@@ -54,8 +60,22 @@ class ProductDetailsFragment : BaseFragment(), ProductSubscriptionContract.View,
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupSubscriptionButton()
         setupProductDetails()
         messageHandler.setListener(this)
+    }
+
+    private fun setupSubscriptionButton() {
+        subscriptionButton.setOnClickListener {
+            when (subscribed) {
+                true -> {
+                    presenter.unsubscribe(product!!.securityId)
+                }
+                false -> {
+                    presenter.subscribe(product!!.securityId)
+                }
+            }
+        }
     }
 
     private fun setupProductDetails() {
@@ -69,21 +89,40 @@ class ProductDetailsFragment : BaseFragment(), ProductSubscriptionContract.View,
         }
     }
 
-    override fun onMessageReceived(message: WebSocketMessage) {
-        if (message.body?.securityId == product?.securityId) {
-            updateProduct(message.body?.currentPrice)
-        }
-    }
-
     override fun onError() {
         val errorMessage = getString(R.string.check_connection)
         Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+    }
+
+    override fun onMessageReceived(message: WebSocketMessage) {
+        if (message.body?.securityId == product?.securityId) {
+            updateProduct(message.body?.currentPrice)
+            onProductSubscriptionChanged(product!!.securityId, true)
+        }
     }
 
     private fun updateProduct(currentPrice: String?) {
         currentPrice?.let {
             product?.currentPrice?.amount = it
             setupProductDetails()
+        }
+    }
+
+    override fun onProductSubscriptionChanged(securityId: String, subscribed: Boolean) {
+        if (this.subscribed != subscribed) {
+            this.subscribed = subscribed
+            updateSubscriptionButton()
+        }
+    }
+
+    private fun updateSubscriptionButton() {
+        when (subscribed) {
+            true -> {
+                subscriptionButton.text = getString(R.string.unsubscribe)
+            }
+            false -> {
+                subscriptionButton.text = getString(R.string.subscribe)
+            }
         }
     }
 

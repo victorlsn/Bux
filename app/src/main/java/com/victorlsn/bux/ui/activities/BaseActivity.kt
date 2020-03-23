@@ -31,7 +31,8 @@ open class BaseActivity : DaggerAppCompatActivity() {
         if (!handled) {
             if (!doubleBackToExitPressedOnce) {
                 doubleBackToExitPressedOnce = true
-                Toast.makeText(this, getString(R.string.press_back_again), Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.press_back_again), Toast.LENGTH_SHORT)
+                    .show()
                 Handler().postDelayed({ doubleBackToExitPressedOnce = false }, 2000)
             } else {
                 super.onBackPressed()

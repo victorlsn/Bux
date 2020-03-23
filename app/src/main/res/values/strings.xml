@@ -8,6 +8,8 @@
 	<string name="previous_day_close">Previous day close:</string>
 	<string name="price_difference">Price Difference:</string>
 	<string name="current_price">Current price:</string>
+	<string name="subscribe">Subscribe</string>
+	<string name="unsubscribe">Unsubscribe</string>
 
 
 </resources>
