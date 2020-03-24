@@ -116,12 +116,14 @@ class ProductDetailsFragment : BaseFragment(), ProductSubscriptionContract.View,
     }
 
     private fun updateSubscriptionButton() {
-        when (subscribed) {
-            true -> {
-                subscriptionButton.text = getString(R.string.unsubscribe)
-            }
-            false -> {
-                subscriptionButton.text = getString(R.string.subscribe)
+        if (subscriptionButton != null) {
+            when (subscribed) {
+                true -> {
+                    subscriptionButton.text = getString(R.string.unsubscribe)
+                }
+                false -> {
+                    subscriptionButton.text = getString(R.string.subscribe)
+                }
             }
         }
     }
